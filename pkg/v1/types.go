@@ -1,20 +1,20 @@
 package v1
 
 type Metadata struct {
-	Name string
-	Namespace string
+	Name string `json:"name"`
+	Namespace string `json:"namespace"`
 }
 
 type WebsiteSpec struct {
-	GitRepo string
+	GitRepo string `json:"gitRepo"`
 }
 
 type Website struct {
-	Metadata Metadata
-	Spec WebsiteSpec
+	Metadata Metadata `json:"metadata"`
+	Spec WebsiteSpec `json:"spec"`
 }
 
 type WebsiteWatchEvent struct {
-	Type string
-	Object Website
+	Kind string `json:"type"`
+	MyObject Website `json:"object"`
 }

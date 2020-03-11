@@ -9,16 +9,28 @@ import (
 	"./v1"
 	"io/ioutil"
 	"strings"
+	"time"
 )
 
 func main() {
-	log.Println("website-controller started.")
+	log.Println("website-controller started. 1.0.5")
 	for {
 		resp, err := http.Get("http://localhost:8001/apis/extensions.example.com/v1/websites?watch=true")
 		if err != nil {
 			panic(err)
 		}
 		defer resp.Body.Close()
+
+    fmt.Println("HTTP Response Status:", resp.StatusCode, http.StatusText(resp.StatusCode))
+
+    //if resp.StatusCode == http.StatusOK {
+	    bodyBytes, err := ioutil.ReadAll(resp.Body)
+	    if err != nil {
+	        log.Fatal(err)
+	    }
+	    bodyString := string(bodyBytes)
+	    log.Printf("Got Response: %s", bodyString)
+		//}
 
 		decoder := json.NewDecoder(resp.Body)
 		for {
@@ -29,14 +41,15 @@ func main() {
 				log.Fatal(err)
 			}
 
-			log.Printf("Received watch event: %s: %s: %s\n", event.Type, event.Object.Metadata.Name, event.Object.Spec.GitRepo)
+			log.Printf("Received watch event: %s: %s: %s\n", event.Kind, event.MyObject.Metadata.Name, event.MyObject.Spec.GitRepo)
 
-			if event.Type == "ADDED" {
-				createWebsite(event.Object)
-			} else if event.Type == "DELETED" {
-				deleteWebsite(event.Object)
+			if event.Kind == "ADDED" {
+				createWebsite(event.MyObject)
+			} else if event.Kind == "DELETED" {
+				deleteWebsite(event.MyObject)
 			}
 		}
+		time.Sleep(5000 * time.Millisecond)
 	}
 
 }
